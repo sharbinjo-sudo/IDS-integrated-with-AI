@@ -1,0 +1,7 @@
+C:\Users\sharb\source\repos\IDS\IDS.Frontend\bin\Release\net8.0-windows\publish\win-x64\IDS.Frontend.pdb
+C:\Users\sharb\source\repos\IDS\IDS.Frontend\bin\Release\net8.0-windows\publish\win-x64\D3DCompiler_47_cor3.dll
+C:\Users\sharb\source\repos\IDS\IDS.Frontend\bin\Release\net8.0-windows\publish\win-x64\PenImc_cor3.dll
+C:\Users\sharb\source\repos\IDS\IDS.Frontend\bin\Release\net8.0-windows\publish\win-x64\PresentationNative_cor3.dll
+C:\Users\sharb\source\repos\IDS\IDS.Frontend\bin\Release\net8.0-windows\publish\win-x64\vcruntime140_cor3.dll
+C:\Users\sharb\source\repos\IDS\IDS.Frontend\bin\Release\net8.0-windows\publish\win-x64\wpfgfx_cor3.dll
+C:\Users\sharb\source\repos\IDS\IDS.Frontend\bin\Release\net8.0-windows\publish\win-x64\IDS.Frontend.exe
