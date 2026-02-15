@@ -31,7 +31,6 @@ namespace IDS.Backend
 
                 Console.Clear();
                 Console.WriteLine("LIVE NETWORK FLOWS (KB/s)");
-                Console.WriteLine("--------------------------------");
                 foreach (var f in flows)
                     Console.WriteLine($"{f.SourceIP} -> {f.DestinationIP} | {f.SpeedKbps}");
             }

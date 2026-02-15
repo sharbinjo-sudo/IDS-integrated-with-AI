@@ -1,14 +1,12 @@
-﻿using PacketDotNet;
+﻿using IDS.Backend.Flow;
+using PacketDotNet;
 using SharpPcap;
-using IDS.Backend.Flow;
-using System;
 
 namespace IDS.Backend.Capture
 {
     public class PacketCaptureService
     {
         private readonly FlowTracker _tracker;
-        private ICaptureDevice? _device;
 
         public PacketCaptureService(FlowTracker tracker)
         {
@@ -21,48 +19,35 @@ namespace IDS.Backend.Capture
             if (devices.Count == 0)
                 throw new Exception("No capture devices found");
 
-            Console.WriteLine("Available devices:\n");
             for (int i = 0; i < devices.Count; i++)
                 Console.WriteLine($"{i}: {devices[i].Description}");
 
-            Console.Write("\nSelect device number: ");
-            if (!int.TryParse(Console.ReadLine(), out int index) ||
-                index < 0 || index >= devices.Count)
-                throw new Exception("Invalid device selection");
+            Console.Write("Select device number: ");
+            var index = int.Parse(Console.ReadLine()!);
 
-            _device = devices[index];
-            _device.OnPacketArrival += OnPacketArrival;
-            _device.Open(DeviceModes.Promiscuous);
-            _device.StartCapture();
+            var device = devices[index];
+            device.OnPacketArrival += OnPacketArrival;
+            device.Open(DeviceModes.Promiscuous);
+            device.StartCapture();
 
-            Console.WriteLine($"\nCapturing on: {_device.Description}");
+            Console.WriteLine($"Capturing on {device.Description}");
         }
 
         private void OnPacketArrival(object sender, PacketCapture e)
         {
-            try
-            {
-                var raw = e.GetPacket();
-                var packet = Packet.ParsePacket(raw.LinkLayerType, raw.Data);
-                var ip = packet.Extract<IPPacket>();
-                if (ip == null) return;
+            var packet = Packet.ParsePacket(
+                e.GetPacket().LinkLayerType,
+                e.GetPacket().Data
+            );
 
-                _tracker.Add(
-                    ip.SourceAddress.ToString(),
-                    ip.DestinationAddress.ToString(),
-                    ip.TotalLength
-                );
-            }
-            catch
-            {
-                // Ignore malformed packets
-            }
-        }
+            var ip = packet.Extract<IPPacket>();
+            if (ip == null) return;
 
-        public void Stop()
-        {
-            _device?.StopCapture();
-            _device?.Close();
+            _tracker.Add(
+                ip.SourceAddress.ToString(),
+                ip.DestinationAddress.ToString(),
+                ip.TotalLength
+            );
         }
     }
 }

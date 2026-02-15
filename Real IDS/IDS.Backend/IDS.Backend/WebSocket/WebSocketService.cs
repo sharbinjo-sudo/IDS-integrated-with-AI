@@ -6,24 +6,33 @@ namespace IDS.Backend.WebSocket
 {
     public class WebSocketService
     {
-        private IWebSocketConnection _client;
+        private IWebSocketConnection? _client;
 
         public void Start()
         {
             var server = new WebSocketServer("ws://127.0.0.1:8181");
             server.Start(ws =>
             {
-                ws.OnOpen = () => _client = ws;
-                ws.OnClose = () => _client = null;
+                ws.OnOpen = () =>
+                {
+                    _client = ws;
+                    Console.WriteLine("Frontend connected");
+                };
+
+                ws.OnClose = () =>
+                {
+                    _client = null;
+                    Console.WriteLine("Frontend disconnected");
+                };
             });
 
             Console.WriteLine("WebSocket server running");
         }
 
-        public void Send(List<FlowStat> stats)
+        public void Send(List<FlowStat> flows)
         {
             if (_client == null) return;
-            _client.Send(JsonSerializer.Serialize(stats));
+            _client.Send(JsonSerializer.Serialize(flows));
         }
     }
 }
