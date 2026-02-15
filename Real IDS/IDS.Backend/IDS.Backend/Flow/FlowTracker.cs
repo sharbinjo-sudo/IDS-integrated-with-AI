@@ -9,26 +9,34 @@ namespace IDS.Backend.Flow
 
         public void Add(string src, string dst, int length)
         {
-            string key = $"{src}->{dst}";
+            var key = $"{src}->{dst}";
             _bytes.AddOrUpdate(key, length, (_, old) => old + length);
         }
 
         public List<FlowStat> SnapshotAndReset(double seconds)
         {
-            var list = _bytes.Select(f =>
-            {
-                var parts = f.Key.Split("->");
-                double kbps = (f.Value / 1024.0) / seconds;
+            var list = new List<FlowStat>();
 
-                return new FlowStat
+            foreach (var kv in _bytes)
+            {
+                var parts = kv.Key.Split("->");
+                var kbps = (kv.Value / 1024.0) / seconds;
+
+                var severity =
+                    kbps > 5000 ? "High" :
+                    kbps > 1000 ? "Medium" : "Low";
+
+                list.Add(new FlowStat
                 {
+                    Time = DateTime.Now,
                     SourceIP = parts[0],
                     DestinationIP = parts[1],
                     SpeedKbps = Math.Round(kbps, 1),
-                    Severity = kbps > 5000 ? "High" : "Medium",
-                    Time = DateTime.Now
-                };
-            }).ToList();
+                    Severity = severity,
+                    DetectionType = kbps > 5000 ? "Anomaly" : "Flow",
+                    Summary = $"Traffic {Math.Round(kbps, 1)} KB/s"
+                });
+            }
 
             _bytes.Clear();
             return list;
